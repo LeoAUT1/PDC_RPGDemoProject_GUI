@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -25,17 +27,37 @@ public class GameScreen extends JPanel {
     private Player player;
     private Inventory inventory;
 
+    public int progress;
+    public boolean questStarted;
+
     public GameScreen() {
         // Prompt the user for their name
-        String playerName = JOptionPane.showInputDialog("Please enter your name:");
+        String playerName = JOptionPane.showInputDialog("Please enter your name: ");
 
         setPreferredSize(new Dimension(800, 500));
         setLayout(new BorderLayout());
-        
-        //User text input
+
+        //User text input (WIP)
         userInput = new JTextField();
         userInput.setPreferredSize(new Dimension(700, 25));
-        
+        userInput.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    // The Enter key was pressed
+                    // You can start the combat or do other things here
+                    // For example:
+                    Player pn = new Player(player.getPlayerName(), 30);
+                    KoboldEnemy kobold = new KoboldEnemy();
+                    Combat c = new Combat(pn, kobold, dialogueArea, userInput); // Pass userInput to Combat
+                    c.playerCombat();
+                    if (!pn.isAlive()) {
+                        dialogueArea.append("\nYOU DIED!\nGAME OVER");
+                        return;
+                    }
+                }
+            }
+        });
+
         //Dialogue area
         dialogueArea = new JTextArea();
         dialogueArea.setEditable(false);
@@ -44,16 +66,16 @@ public class GameScreen extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         inventory = new Inventory(dialogueArea, userInput);
-        
-        //Create a new Player object
+
+        //Player object
         player = new Player();
         player.setPlayerName(playerName);
-        
+
         dialogues = new LinkedList<>();
         dialogues.add(Dialogue.getGreeting(playerName));
         dialogues.add(Dialogue.getGuildWelcome());
         dialogues.add(Dialogue.getQuestInfo());
-        
+
         //Buttons
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -63,6 +85,7 @@ public class GameScreen extends JPanel {
         buttonPanel.add(createButton("Inventory"));
         buttonPanel.add(createButton("Save Game"));
         buttonPanel.add(createButton("Load Game"));
+        buttonPanel.add(createButton("Exit Game"));
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -85,7 +108,14 @@ public class GameScreen extends JPanel {
         JButton plainsButton = createButton("The Plains");
         plainsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                Player pn = new Player(player.getPlayerName(), 30);
+                KoboldEnemy kobold = new KoboldEnemy();
+                Combat c = new Combat(player, kobold, dialogueArea, userInput); // Pass dialogueArea to Combat
+                c.playerCombat();
+                if (!pn.isAlive()) {
+                    dialogueArea.append("\nYOU DIED!\nGAME OVER");
+                    return;
+                }
             }
         });
         buttonPanel.add(plainsButton);
@@ -103,6 +133,7 @@ public class GameScreen extends JPanel {
                     dialogueArea.setText("");
                     for (String dialogue : dialogues) {
                         dialogueArea.append("\n" + dialogue);
+                        timer.start();
                     }
                 } else {
                     // Showing inventory
@@ -117,7 +148,7 @@ public class GameScreen extends JPanel {
         JButton saveButton = createButton("Save Game");
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                GameSave.saveGame(player, inventory, player.getLevel(), progress, dialogueArea);
             }
         });
         buttonPanel.add(saveButton);
@@ -125,7 +156,7 @@ public class GameScreen extends JPanel {
         JButton loadButton = createButton("Load Game");
         loadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                GameSave.loadGame(dialogueArea);
             }
         });
         buttonPanel.add(loadButton);
@@ -137,9 +168,8 @@ public class GameScreen extends JPanel {
             }
         });
         buttonPanel.add(exitButton);
-        
-        
-        timer = new Timer(2000, new ActionListener() { // 2000 ms delay
+
+        timer = new Timer(3000, new ActionListener() { // 3s delay
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!dialogues.isEmpty()) {
@@ -165,7 +195,7 @@ public class GameScreen extends JPanel {
 
         // Start the timer
         timer.start();
-        
+
         //Text field input layout
         textFieldPanel = new JPanel();
         textFieldPanel.setLayout(new BoxLayout(textFieldPanel, BoxLayout.PAGE_AXIS));
