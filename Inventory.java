@@ -4,10 +4,7 @@
  */
 package pdcGUI;
 
-import pdcproject.*;
 import java.io.Serializable;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 

@@ -4,7 +4,6 @@
  */
 package pdcGUI;
 
-import pdcproject.*;
 
 /**
  *

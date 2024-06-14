@@ -4,11 +4,12 @@
  */
 package pdcGUI;
 
-import pdcproject.*;
-import java.util.InputMismatchException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  *
@@ -31,7 +32,7 @@ public class Combat {
     }
 
     public void playerCombat() {
-        dialogueArea.append("A kobold has appeared!\n");
+        dialogueArea.append("\nA kobold has appeared!\n");
         pause(3);
 
         while (player.isAlive() && kobold.isAlive()) {
@@ -77,7 +78,7 @@ public class Combat {
                         }
                         break;
                     default:
-                        dialogueArea.append("INCORRECT INPUT");
+                        dialogueArea.append("\nINCORRECT INPUT");
                 }
             } catch (NumberFormatException e) {
                 dialogueArea.append("\nPLEASE ENTER A NUMBER(1-4)");
@@ -85,9 +86,9 @@ public class Combat {
             }
 
             if (!kobold.isAlive()) {
-                dialogueArea.append("YOU WON! YOU GOT 50 EXP!");
+                dialogueArea.append("\nYOU WON! YOU GOT 50 EXP!");
                 player.gainEXP(kobold.getDroppedEXP());
-                dialogueArea.append("YOU GOT A " + kobold.getDroppedItems() + "!\n\n\n\n");
+                dialogueArea.append("\nYOU GOT A " + kobold.getDroppedItems() + "!\n\n\n\n");
                 pause(3);
             }
         }
@@ -95,7 +96,7 @@ public class Combat {
 
     public void battleScreen() {
         dialogueArea.append("\nWHAT DO YOU WANT TO DO!");
-        dialogueArea.append("[1]FIGHT\n[2]CHECK\n[3]INV\n[4]RUN");
+        dialogueArea.append("\n[1]FIGHT\n[2]CHECK\n[3]INV\n[4]RUN");
     }
 
     public void playerAttack() {
@@ -151,10 +152,13 @@ public class Combat {
     }
 
     public void pause(int seconds) {
-        try {
-            Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e) {
-            dialogueArea.append(e.getLocalizedMessage());
-        }
+        Timer timer = new Timer(seconds * 1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
+        timer.setRepeats(false); // Make sure the timer only runs once
+        timer.start(); // Start the timer
     }
 }

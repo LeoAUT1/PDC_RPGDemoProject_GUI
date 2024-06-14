@@ -4,7 +4,6 @@
  */
 package pdcGUI;
 
-import pdcproject.*;
 
 /**
  *
@@ -14,7 +13,7 @@ public class Player extends Level implements healthPoints {
 
     private String playerName;
     private int hp = 30;
-    private Level playerLevel;
+    private final Level playerLevel;
 
     //player stats
     public Player(String playerName, int hp) {
@@ -23,9 +22,6 @@ public class Player extends Level implements healthPoints {
         this.playerLevel = new Level();
     }
 
-    //empty constructor
-    public Player() {
-    }
 
     public String getPlayerName() {
         return playerName;
